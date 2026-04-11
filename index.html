@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VideoSave - Descarga vídeos gratis</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: white; min-height: 100vh; }
+    header { background: #1a1a2e; padding: 20px; text-align: center; border-bottom: 2px solid #e94560; }
+    header h1 { color: #e94560; font-size: 2rem; letter-spacing: 1px; }
+    header p { color: #aaa; margin-top: 5px; }
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .hero h2 { font-size: 2.2rem; margin-bottom: 15px; }
+    .hero p { color: #aaa; font-size: 1rem; margin-bottom: 40px; }
+    .search-box { display: flex; max-width: 700px; margin: 0 auto; gap: 10px; }
+    .search-box input { flex: 1; padding: 18px 24px; border-radius: 50px; border: 2px solid #333; background: #1a1a2e; color: white; font-size: 1rem; outline: none; }
+    .search-box input:focus { border-color: #e94560; }
+    .search-box button { padding: 18px 36px; background: #e94560; color: white; border: none; border-radius: 50px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .search-box button:hover { background: #c73652; transform: scale(1.03); }
+    .platforms { display: flex; justify-content: center; gap: 30px; margin-top: 20px; color: #aaa; font-size: 0.9rem; }
+    #result { max-width: 700px; margin: 30px auto; padding: 0 20px 60px; }
+    .video-card { background: #1a1a2e; border-radius: 16px; padding: 24px; border: 1px solid #2a2a3e; }
+    .video-player { width: 100%; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 16px; }
+    .video-player video { width: 100%; display: block; max-height: 400px; }
+    .video-title { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+    .video-duration { color: #aaa; font-size: 0.85rem; margin-bottom: 20px; }
+    .formats-title { color: #aaa; font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    .formats { display: flex; flex-direction: column; gap: 8px; }
+    .format-btn { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #0f0f1a; border: 1px solid #2a2a3e; border-radius: 10px; text-decoration: none; color: white; transition: 0.2s; cursor: pointer; }
+    .format-btn:hover { border-color: #e94560; background: #1a0a10; }
+    .format-btn .quality { font-weight: bold; color: #e94560; font-size: 1rem; }
+    .format-btn .info { color: #888; font-size: 0.85rem; }
+    .format-btn .dl-btn { background: #e94560; padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; }
+    .loading { text-align: center; padding: 50px; color: #aaa; }
+    .error { background: #2d1a1a; border: 1px solid #e94560; border-radius: 10px; padding: 20px; color: #ff6b6b; text-align: center; }
+    footer { text-align: center; padding: 40px 20px; color: #444; border-top: 1px solid #1a1a2e; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎬 VideoSave</h1>
+  <p>Descarga vídeos de TikTok, YouTube e Instagram gratis</p>
+</header>
+
+<div class="hero">
+  <h2>Descarga cualquier vídeo</h2>
+  <p>Pega el link y descarga en alta calidad, sin marca de agua</p>
+  <div class="search-box">
+    <input type="text" id="urlInput" placeholder="Pega aquí el link del vídeo..." />
+    <button onclick="getVideo()">⬇ Obtener vídeo</button>
+  </div>
+  <div class="platforms">
+    <span>✅ TikTok</span>
+    <span>✅ YouTube</span>
+    <span>✅ Instagram</span>
+  </div>
+</div>
+
+<div id="result"></div>
+
+<footer>
+  <p>VideoSave © 2025 — Descarga vídeos gratis y sin marca de agua</p>
+</footer>
+
+<script>
+  let currentUrl = '';
+
+  async function getVideo() {
+    const url = document.getElementById('urlInput').value.trim();
+    const result = document.getElementById('result');
+    if (!url) return alert('Por favor pega un link');
+    currentUrl = url;
+
+    result.innerHTML = '<div class="loading">⏳ Obteniendo información del vídeo...</div>';
+
+    try {
+      const res = await fetch('/api/info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      const formatsHTML = data.formats.map(f => `
+        <a class="format-btn" href="/api/download?url=${encodeURIComponent(currentUrl)}&quality=${f.quality}">
+          <span class="quality">${f.quality}</span>
+          <span class="info">${f.label}</span>
+          <span class="dl-btn">⬇ Descargar</span>
+        </a>`).join('');
+
+      result.innerHTML = `
+        <div class="video-card">
+          <div class="video-player">
+            <video controls preload="metadata" poster="${data.thumbnail}">
+              <source src="${data.thumbnail}" type="video/mp4">
+            </video>
+          </div>
+          <div class="video-title">${data.title}</div>
+          <div class="video-duration">⏱ ${data.duration || 'N/A'}</div>
+          <div class="formats-title">Elige la calidad</div>
+          <div class="formats">${formatsHTML}</div>
+        </div>`;
+    } catch (e) {
+      result.innerHTML = `<div class="error">❌ ${e.message}</div>`;
+    }
+  }
+
+  document.getElementById('urlInput').addEventListener('keypress', e => {
+    if (e.key === 'Enter') getVideo();
+  });
+</script>
+
+</body>
+</html>

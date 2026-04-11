@@ -1,0 +1,60 @@
+const express = require('express');
+const cors = require('cors');
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
+const os = require('os');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname));
+
+app.post('/api/info', (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: 'URL requerida' });
+
+  exec(`yt-dlp --dump-json --no-playlist "${url}"`, (error, stdout) => {
+    if (error) return res.status(500).json({ error: 'No se pudo obtener el vídeo.' });
+    try {
+      const info = JSON.parse(stdout);
+      res.json({
+        title: info.title,
+        thumbnail: info.thumbnail,
+        duration: info.duration_string,
+        formats: [
+          { quality: '360p', label: '360p · Ligero' },
+          { quality: '480p', label: '480p · Estándar' },
+          { quality: '720p', label: '720p · HD' },
+          { quality: '1080p', label: '1080p · Full HD' }
+        ]
+      });
+    } catch (e) {
+      res.status(500).json({ error: 'Error procesando la respuesta' });
+    }
+  });
+});
+
+app.get('/api/download', (req, res) => {
+  const { url, quality } = req.query;
+  if (!url) return res.status(400).json({ error: 'URL requerida' });
+
+  const height = (quality || '480p').replace('p', '');
+  const tmpFile = path.join(os.tmpdir(), `video_${Date.now()}.mp4`);
+  const cmd = `yt-dlp -f "bestvideo[height<=${height}]+bestaudio/best[height<=${height}]" --merge-output-format mp4 -o "${tmpFile}" "${url}"`;
+
+  exec(cmd, { timeout: 120000 }, (error) => {
+    if (error || !fs.existsSync(tmpFile)) {
+      if (!res.headersSent) res.status(500).json({ error: 'Error descargando' });
+      return;
+    }
+    res.setHeader('Content-Disposition', `attachment; filename="video_${height}p.mp4"`);
+    res.setHeader('Content-Type', 'video/mp4');
+    const stream = fs.createReadStream(tmpFile);
+    stream.pipe(res);
+    stream.on('close', () => fs.unlink(tmpFile, () => {}));
+  });
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
