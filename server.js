@@ -23,7 +23,6 @@ app.post('/api/info', (req, res) => {
         thumbnail: info.thumbnail,
         duration: info.duration_string,
         formats: [
-          { quality: '360p', label: '360p · Ligero' },
           { quality: '480p', label: '480p · Estándar' },
           { quality: '720p', label: '720p · HD' },
           { quality: '1080p', label: '1080p · Full HD' }
@@ -39,13 +38,13 @@ app.get('/api/download', (req, res) => {
   const { url, quality } = req.query;
   if (!url) return res.status(400).json({ error: 'URL requerida' });
 
-  const height = (quality || '480p').replace('p', '');
+  const height = (quality || '720p').replace('p', '');
   const tmpFile = path.join(os.tmpdir(), `video_${Date.now()}.mp4`);
-  const cmd = `yt-dlp -f "bestvideo[height<=${height}]+bestaudio/best[height<=${height}]" --merge-output-format mp4 -o "${tmpFile}" "${url}"`;
+  const cmd = `yt-dlp -f "bestvideo[height<=${height}][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${height}]+bestaudio/best[height<=${height}]/best" --merge-output-format mp4 -o "${tmpFile}" "${url}"`;
 
-  exec(cmd, { timeout: 120000 }, (error) => {
+  exec(cmd, { timeout: 300000 }, (error) => {
     if (error || !fs.existsSync(tmpFile)) {
-      if (!res.headersSent) res.status(500).json({ error: 'Error descargando' });
+      if (!res.headersSent) res.status(500).json({ error: 'Error descargando el vídeo' });
       return;
     }
     res.setHeader('Content-Disposition', `attachment; filename="video_${height}p.mp4"`);

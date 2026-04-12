@@ -43,6 +43,9 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-text { font-size: 1rem; color: white; margin-bottom: 6px; }
     .loading-sub { font-size: 0.82rem; color: #666; }
+    .dl-loading { background: #1a1a2e; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 16px; border: 1px solid #e94560; }
+    .dl-loading p { color: white; font-size: 0.95rem; margin-bottom: 6px; }
+    .dl-loading small { color: #666; font-size: 0.82rem; }
     .error { background: #2d1a1a; border: 1px solid #e94560; border-radius: 10px; padding: 20px; color: #ff6b6b; text-align: center; }
     footer { text-align: center; padding: 30px 20px; color: #444; border-top: 1px solid #1a1a2e; font-size: 0.85rem; }
   </style>
@@ -99,7 +102,7 @@
       if (data.error) throw new Error(data.error);
 
       const formatsHTML = data.formats.map(f => `
-        <a class="format-btn" href="/api/download?url=${encodeURIComponent(currentUrl)}&quality=${f.quality}">
+        <a class="format-btn" href="/api/download?url=${encodeURIComponent(currentUrl)}&quality=${f.quality}" onclick="showDownloading()">
           <span class="quality">${f.quality}</span>
           <span class="info">${f.label}</span>
           <span class="dl-btn">⬇ Descargar</span>
@@ -120,6 +123,19 @@
     } catch (e) {
       result.innerHTML = `<div class="error">❌ ${e.message}</div>`;
     }
+  }
+
+  function showDownloading() {
+    setTimeout(() => {
+      const existing = document.getElementById('dl-loading');
+      if (existing) existing.remove();
+      document.getElementById('result').insertAdjacentHTML('afterbegin', `
+        <div id="dl-loading" class="dl-loading">
+          <div class="spinner"></div>
+          <p>Preparando tu descarga...</p>
+          <small>Esto puede tardar 1-2 minutos según la calidad</small>
+        </div>`);
+    }, 100);
   }
 
   document.getElementById('urlInput').addEventListener('keypress', e => {
