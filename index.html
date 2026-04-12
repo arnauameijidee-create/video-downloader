@@ -43,10 +43,10 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-text { font-size: 1rem; color: white; margin-bottom: 6px; }
     .loading-sub { font-size: 0.82rem; color: #666; }
-    .dl-loading { background: #1a1a2e; border-radius: 12px; padding: 24px 20px; text-align: center; margin-bottom: 16px; border: 1px solid #e94560; }
+    .dl-loading { background: #1a1a2e; border-radius: 12px; padding: 24px 20px; text-align: center; margin-top: 16px; border: 1px solid #e94560; }
     .dl-loading p { color: white; font-size: 0.95rem; margin-bottom: 6px; }
     .dl-loading small { color: #666; font-size: 0.82rem; }
-    .dl-success { background: #1a2e1a; border-radius: 12px; padding: 24px 20px; text-align: center; margin-bottom: 16px; border: 1px solid #4caf50; }
+    .dl-success { background: #1a2e1a; border-radius: 12px; padding: 24px 20px; text-align: center; margin-top: 16px; border: 1px solid #4caf50; }
     .dl-success .check { font-size: 2.5rem; margin-bottom: 10px; }
     .dl-success p { color: white; font-size: 1rem; font-weight: 600; }
     .error { background: #2d1a1a; border: 1px solid #e94560; border-radius: 10px; padding: 20px; color: #ff6b6b; text-align: center; }
@@ -121,7 +121,8 @@
           <div class="video-title">${data.title}</div>
           <div class="video-duration">⏱ ${data.duration || 'N/A'}</div>
           <div class="formats-title">Elige la calidad</div>
-          <div class="formats">${formatsHTML}</div>
+          <div class="formats" id="formats-list">${formatsHTML}</div>
+          <div id="dl-status"></div>
         </div>`;
     } catch (e) {
       result.innerHTML = `<div class="error">❌ ${e.message}</div>`;
@@ -129,25 +130,26 @@
   }
 
   function startDownload(quality) {
-    const existing = document.getElementById('dl-loading');
-    if (existing) existing.remove();
-
-    document.getElementById('result').insertAdjacentHTML('afterbegin', `
-      <div id="dl-loading" class="dl-loading">
-        <div class="spinner"></div>
-        <p>Preparando tu descarga en ${quality}...</p>
-        <small>En unos segundos aparecerá en tu carpeta de descargas.</small>
-      </div>`);
+    const status = document.getElementById('dl-status');
+    if (status) {
+      status.innerHTML = `
+        <div class="dl-loading">
+          <div class="spinner"></div>
+          <p>Preparando tu descarga en ${quality}...</p>
+          <small>En unos segundos aparecerá en tu carpeta de descargas.</small>
+        </div>`;
+    }
 
     window.location.href = `/api/download?url=${encodeURIComponent(currentUrl)}&quality=${quality}`;
 
     setTimeout(() => {
-      const dl = document.getElementById('dl-loading');
-      if (dl) {
-        dl.className = 'dl-success';
-        dl.innerHTML = `
-          <div class="check">✅</div>
-          <p>¡Listo! Tienes tu vídeo en el apartado de descargas.</p>`;
+      const status = document.getElementById('dl-status');
+      if (status) {
+        status.innerHTML = `
+          <div class="dl-success">
+            <div class="check">✅</div>
+            <p>¡Listo! Tienes tu vídeo en el apartado de descargas.</p>
+          </div>`;
       }
     }, 5000);
   }
