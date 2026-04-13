@@ -3,81 +3,231 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GetYourVideo - Descarga vídeos gratis</title>
+  <title>GetYourVideo - Descarga vídeos de TikTok gratis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: white; min-height: 100vh; }
-    header { background: #1a1a2e; padding: 16px 20px; text-align: center; border-bottom: 2px solid #e94560; }
-    header h1 { color: #e94560; font-size: 1.8rem; letter-spacing: 1px; }
-    header p { color: #aaa; margin-top: 4px; font-size: 0.9rem; }
-    .hero { text-align: center; padding: 40px 16px 30px; }
-    .hero h2 { font-size: 1.8rem; margin-bottom: 12px; line-height: 1.3; }
-    .hero p { color: #aaa; font-size: 0.95rem; margin-bottom: 30px; }
+    body { font-family: 'Inter', sans-serif; background: #080812; color: white; min-height: 100vh; }
+
+    /* HEADER */
+    header { background: linear-gradient(135deg, #0d0d1a 0%, #12122a 100%); padding: 18px 20px; text-align: center; border-bottom: 1px solid rgba(155, 89, 255, 0.3); }
+    header h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: 2px; background: linear-gradient(90deg, #9b59ff, #e94560, #ff9f43); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    header p { color: #888; margin-top: 5px; font-size: 0.88rem; font-weight: 400; letter-spacing: 0.5px; }
+
+    /* HERO */
+    .hero { text-align: center; padding: 50px 16px 35px; background: radial-gradient(ellipse at top, rgba(155,89,255,0.08) 0%, transparent 70%); }
+    .hero h2 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; line-height: 1.3; background: linear-gradient(135deg, #ffffff 0%, #ccccff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { color: #888; font-size: 0.95rem; margin-bottom: 32px; font-weight: 400; }
+    @media (min-width: 600px) { .hero h2 { font-size: 2.6rem; } }
+
+    /* SEARCH BOX */
     .search-box { display: flex; flex-direction: column; max-width: 680px; margin: 0 auto; gap: 10px; }
-    .search-box input { width: 100%; padding: 16px 20px; border-radius: 50px; border: 2px solid #333; background: #1a1a2e; color: white; font-size: 1rem; outline: none; }
-    .search-box input:focus { border-color: #e94560; }
-    .search-box button { width: 100%; padding: 16px; background: #e94560; color: white; border: none; border-radius: 50px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .search-box button:hover { background: #c73652; }
+    .search-box input { width: 100%; padding: 16px 22px; border-radius: 50px; border: 1.5px solid rgba(155,89,255,0.3); background: rgba(255,255,255,0.04); color: white; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif; transition: 0.2s; }
+    .search-box input::placeholder { color: #555; }
+    .search-box input:focus { border-color: #9b59ff; background: rgba(155,89,255,0.06); }
+    .search-box button { width: 100%; padding: 16px; background: linear-gradient(135deg, #9b59ff, #e94560); color: white; border: none; border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; }
+    .search-box button:hover { opacity: 0.9; transform: scale(1.02); }
     @media (min-width: 600px) {
       .search-box { flex-direction: row; }
       .search-box input { flex: 1; width: auto; }
       .search-box button { width: auto; padding: 16px 32px; }
-      .hero h2 { font-size: 2.2rem; }
     }
-    .platforms { display: flex; justify-content: center; gap: 20px; margin-top: 16px; color: #aaa; font-size: 0.85rem; flex-wrap: wrap; }
-    #result { max-width: 680px; margin: 24px auto; padding: 0 16px 60px; }
-    .video-card { background: #1a1a2e; border-radius: 16px; padding: 20px; border: 1px solid #2a2a3e; }
+    .platforms { display: flex; justify-content: center; gap: 20px; margin-top: 18px; color: #666; font-size: 0.82rem; flex-wrap: wrap; font-weight: 500; }
+
+    /* RESULT */
+    #result { max-width: 680px; margin: 24px auto; padding: 0 16px; }
+    .video-card { background: linear-gradient(135deg, #0f0f20, #12122a); border-radius: 18px; padding: 20px; border: 1px solid rgba(155,89,255,0.2); }
     .video-player { width: 100%; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 14px; }
     .video-player video { width: 100%; display: block; max-height: 350px; }
     .video-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; line-height: 1.4; }
-    .video-duration { color: #aaa; font-size: 0.8rem; margin-bottom: 16px; }
-    .formats-title { color: #aaa; font-size: 0.8rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .video-duration { color: #666; font-size: 0.8rem; margin-bottom: 16px; }
+    .formats-title { color: #666; font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
     .formats { display: flex; flex-direction: column; gap: 8px; }
-    .format-btn { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #0f0f1a; border: 1px solid #2a2a3e; border-radius: 10px; color: white; transition: 0.2s; cursor: pointer; width: 100%; }
-    .format-btn:hover { border-color: #e94560; background: #1a0a10; }
-    .format-btn .quality { font-weight: bold; color: #e94560; font-size: 0.95rem; }
-    .format-btn .info { color: #888; font-size: 0.8rem; }
-    .format-btn .dl-btn { background: #e94560; padding: 7px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; white-space: nowrap; }
-    .loading { text-align: center; padding: 50px 20px; color: #aaa; }
-    .spinner { width: 48px; height: 48px; border: 4px solid #333; border-top: 4px solid #e94560; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    .format-btn { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(155,89,255,0.15); border-radius: 10px; color: white; transition: 0.2s; cursor: pointer; width: 100%; font-family: 'Inter', sans-serif; }
+    .format-btn:hover { border-color: #9b59ff; background: rgba(155,89,255,0.08); }
+    .format-btn .quality { font-weight: 700; font-size: 0.95rem; background: linear-gradient(90deg, #9b59ff, #e94560); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .format-btn .info { color: #666; font-size: 0.8rem; }
+    .format-btn .dl-btn { background: linear-gradient(135deg, #9b59ff, #e94560); padding: 7px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; color: white; }
+
+    /* LOADING */
+    .loading { text-align: center; padding: 50px 20px; color: #666; }
+    .spinner { width: 48px; height: 48px; border: 3px solid rgba(155,89,255,0.2); border-top: 3px solid #9b59ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 1rem; color: white; margin-bottom: 6px; }
-    .loading-sub { font-size: 0.82rem; color: #666; }
-    .dl-loading { background: #1a1a2e; border-radius: 12px; padding: 24px 20px; text-align: center; margin-top: 16px; border: 1px solid #e94560; }
-    .dl-loading p { color: white; font-size: 0.95rem; margin-bottom: 6px; }
-    .dl-loading small { color: #666; font-size: 0.82rem; }
-    .dl-success { background: #1a2e1a; border-radius: 12px; padding: 24px 20px; text-align: center; margin-top: 16px; border: 1px solid #4caf50; }
+    .loading-text { font-size: 1rem; color: white; margin-bottom: 6px; font-weight: 600; }
+    .loading-sub { font-size: 0.82rem; color: #555; }
+
+    /* DL STATUS */
+    .dl-loading { background: rgba(155,89,255,0.06); border-radius: 12px; padding: 24px 20px; text-align: center; margin-top: 16px; border: 1px solid rgba(155,89,255,0.3); }
+    .dl-loading p { color: white; font-size: 0.95rem; margin-bottom: 6px; font-weight: 600; }
+    .dl-loading small { color: #555; font-size: 0.82rem; }
+    .dl-success { background: rgba(76,175,80,0.06); border-radius: 12px; padding: 24px 20px; text-align: center; margin-top: 16px; border: 1px solid rgba(76,175,80,0.3); }
     .dl-success .check { font-size: 2.5rem; margin-bottom: 10px; }
     .dl-success p { color: white; font-size: 1rem; font-weight: 600; }
-    .error { background: #2d1a1a; border: 1px solid #e94560; border-radius: 10px; padding: 20px; color: #ff6b6b; text-align: center; }
-    footer { text-align: center; padding: 30px 20px; color: #444; border-top: 1px solid #1a1a2e; font-size: 0.85rem; }
+    .error { background: rgba(233,69,96,0.08); border: 1px solid rgba(233,69,96,0.4); border-radius: 10px; padding: 20px; color: #ff6b6b; text-align: center; font-weight: 500; }
+
+    /* INFO SECTIONS */
+    .info-section { max-width: 860px; margin: 0 auto; padding: 40px 16px; }
+    .info-section h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(90deg, #9b59ff, #e94560); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .info-section h3 { font-size: 1.05rem; font-weight: 700; margin: 24px 0 10px; color: #ccc; }
+    .info-section p { color: #777; font-size: 0.88rem; line-height: 1.8; margin-bottom: 12px; }
+    .info-section ul { color: #777; font-size: 0.88rem; line-height: 1.9; padding-left: 20px; margin-bottom: 12px; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 20px 0; }
+    .step { background: linear-gradient(135deg, #0f0f20, #12122a); border-radius: 14px; padding: 20px; border: 1px solid rgba(155,89,255,0.15); text-align: center; }
+    .step .step-num { background: linear-gradient(135deg, #9b59ff, #e94560); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; margin: 0 auto 12px; font-size: 1rem; }
+    .step h4 { color: white; font-size: 0.9rem; margin-bottom: 6px; font-weight: 700; }
+    .step p { color: #666; font-size: 0.8rem; margin: 0; line-height: 1.5; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 20px 0; }
+    .feature { background: linear-gradient(135deg, #0f0f20, #12122a); border-radius: 14px; padding: 20px; border: 1px solid rgba(155,89,255,0.15); }
+    .feature .icon { font-size: 1.6rem; margin-bottom: 10px; }
+    .feature h4 { color: white; font-size: 0.9rem; margin-bottom: 6px; font-weight: 700; }
+    .feature p { color: #666; font-size: 0.8rem; margin: 0; line-height: 1.5; }
+    .divider { border: none; border-top: 1px solid rgba(155,89,255,0.1); margin: 30px 0; }
+    .faq-item { margin-bottom: 18px; padding: 16px; background: linear-gradient(135deg, #0f0f20, #12122a); border-radius: 12px; border: 1px solid rgba(155,89,255,0.1); }
+    .faq-item h4 { color: white; font-size: 0.9rem; margin-bottom: 6px; font-weight: 700; }
+    .faq-item p { color: #666; font-size: 0.84rem; margin: 0; line-height: 1.6; }
+
+    /* FOOTER */
+    footer { text-align: center; padding: 30px 20px; color: #333; border-top: 1px solid rgba(155,89,255,0.1); font-size: 0.82rem; }
+    footer a { color: #444; text-decoration: none; margin: 0 8px; transition: 0.2s; }
+    footer a:hover { color: #9b59ff; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>🎬 GetYourVideo</h1>
-  <p>Descarga vídeos de TikTok, YouTube e Instagram gratis</p>
+  <h1>GetYourVideo</h1>
+  <p>Descarga vídeos de TikTok gratis · Sin marca de agua · Alta calidad</p>
 </header>
 
 <div class="hero">
-  <h2>Descarga cualquier vídeo</h2>
-  <p>Pega el link y descarga en alta calidad, sin marca de agua</p>
+  <h2>Descarga vídeos de TikTok</h2>
+  <p>Pega el link y descarga en alta calidad, sin marca de agua, gratis</p>
   <div class="search-box">
-    <input type="text" id="urlInput" placeholder="Pega aquí el link del vídeo..." />
+    <input type="text" id="urlInput" placeholder="Pega aquí el link del vídeo de TikTok..." />
     <button onclick="getVideo()">⬇ Obtener vídeo</button>
   </div>
   <div class="platforms">
     <span>✅ TikTok</span>
-    <span>✅ YouTube</span>
-    <span>✅ Instagram</span>
+    <span>✅ Sin marca de agua</span>
+    <span>✅ Gratis</span>
   </div>
 </div>
 
 <div id="result"></div>
 
+<div class="info-section">
+  <h2>GetYourVideo — Descargador de TikTok sin marca de agua</h2>
+  <p>GetYourVideo es una herramienta gratuita para descargar vídeos de TikTok sin marca de agua y en la mejor calidad disponible. No necesitas instalar ninguna aplicación ni extensión — todo funciona directamente desde tu navegador.</p>
+
+  <h3>¿Cómo descargar vídeos de TikTok sin marca de agua?</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h4>Abre TikTok</h4>
+      <p>Busca el vídeo que quieres descargar en la app o en tiktok.com</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h4>Copia el link</h4>
+      <p>Pulsa "Compartir" y selecciona "Copiar enlace"</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h4>Pega en GetYourVideo</h4>
+      <p>Pega el link en la barra de arriba y pulsa "Obtener vídeo"</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h4>Descarga y disfruta</h4>
+      <p>Elige la calidad y descarga directo a tu dispositivo</p>
+    </div>
+  </div>
+
+  <h3>¿Qué características tiene GetYourVideo?</h3>
+  <div class="features">
+    <div class="feature">
+      <div class="icon">🎥</div>
+      <h4>Alta calidad</h4>
+      <p>Descarga en Full HD, 1080p, 720p y 480p</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🚫</div>
+      <h4>Sin marca de agua</h4>
+      <p>Vídeos limpios sin el logo de TikTok</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📱</div>
+      <h4>Todos los dispositivos</h4>
+      <p>Compatible con iPhone, Android, PC y Mac</p>
+    </div>
+    <div class="feature">
+      <div class="icon">💰</div>
+      <h4>100% gratis</h4>
+      <p>Sin registro, sin instalación, sin coste</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔒</div>
+      <h4>Privado y seguro</h4>
+      <p>No almacenamos tus vídeos ni tu historial</p>
+    </div>
+    <div class="feature">
+      <div class="icon">⚡</div>
+      <h4>Rápido y sencillo</h4>
+      <p>Descarga en segundos con un solo clic</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h2>Preguntas frecuentes</h2>
+
+  <div class="faq-item">
+    <h4>¿Qué es GetYourVideo?</h4>
+    <p>GetYourVideo es una herramienta online gratuita para descargar vídeos de TikTok sin marca de agua y en alta calidad, directamente desde tu navegador.</p>
+  </div>
+  <div class="faq-item">
+    <h4>¿Es gratuito?</h4>
+    <p>Sí, GetYourVideo es completamente gratuito. Solo mostramos algunos anuncios para mantener el servicio activo.</p>
+  </div>
+  <div class="faq-item">
+    <h4>¿Necesito instalar algo?</h4>
+    <p>No. GetYourVideo funciona directamente en tu navegador, sin necesidad de instalar aplicaciones ni extensiones.</p>
+  </div>
+  <div class="faq-item">
+    <h4>¿Funciona en iPhone y Android?</h4>
+    <p>Sí, GetYourVideo es compatible con todos los dispositivos: iPhone, Android, PC, Mac y tablets.</p>
+  </div>
+  <div class="faq-item">
+    <h4>¿GetYourVideo guarda mis vídeos?</h4>
+    <p>No. No almacenamos copias de los vídeos descargados ni registramos tu historial. Todo el procesamiento se realiza en tiempo real y de forma anónima.</p>
+  </div>
+  <div class="faq-item">
+    <h4>¿Necesito iniciar sesión en TikTok?</h4>
+    <p>No. Solo necesitas el link del vídeo público de TikTok. No pedimos acceso a tu cuenta.</p>
+  </div>
+  <div class="faq-item">
+    <h4>¿Por qué no encuentro el vídeo después de descargarlo?</h4>
+    <p>El vídeo se guarda en la carpeta de "Descargas" de tu dispositivo. En iPhone puedes encontrarlo en la app Archivos.</p>
+  </div>
+
+  <hr class="divider">
+
+  <h2>Privacidad</h2>
+  <p>GetYourVideo respeta tu privacidad. No recopilamos datos personales, no almacenamos vídeos descargados ni rastreamos el historial de descargas. El uso de GetYourVideo es completamente anónimo.</p>
+  <p>Los vídeos que descargas están alojados en los servidores de TikTok. Todos los derechos pertenecen a sus respectivos propietarios.</p>
+
+  <hr class="divider">
+
+  <p style="color:#333; font-size:0.78rem;">⚠️ GetYourVideo no tiene ninguna relación con TikTok o ByteDance Ltd. Esta herramienta está diseñada para ayudar a los usuarios a guardar sus propios vídeos de TikTok. No alojamos ningún contenido de TikTok. Todos los derechos pertenecen a sus respectivos propietarios.</p>
+</div>
+
 <footer>
-  <p>GetYourVideo © 2025 — Descarga vídeos gratis y sin marca de agua</p>
+  <p>GetYourVideo © 2025 — Descarga vídeos de TikTok gratis y sin marca de agua</p>
+  <p style="margin-top:8px;">
+    <a href="#">Privacidad</a>
+    <a href="#">Términos de uso</a>
+    <a href="#">Contacto</a>
+  </p>
 </footer>
 
 <script>
@@ -86,7 +236,7 @@
   async function getVideo() {
     const url = document.getElementById('urlInput').value.trim();
     const result = document.getElementById('result');
-    if (!url) return alert('Por favor pega un link');
+    if (!url) return alert('Por favor pega un link de TikTok');
     currentUrl = url;
 
     result.innerHTML = `<div class="loading">
