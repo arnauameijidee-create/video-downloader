@@ -10,9 +10,29 @@
     body { font-family: 'Inter', sans-serif; background: #080812; color: white; min-height: 100vh; }
 
     /* HEADER */
-    header { background: linear-gradient(135deg, #0d0d1a 0%, #12122a 100%); padding: 18px 20px; text-align: center; border-bottom: 1px solid rgba(155, 89, 255, 0.3); }
+    header { background: linear-gradient(135deg, #0d0d1a 0%, #12122a 100%); padding: 18px 20px; text-align: center; border-bottom: 1px solid rgba(155,89,255,0.3); position: relative; }
     header h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: 2px; background: linear-gradient(90deg, #9b59ff, #e94560, #ff9f43); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     header p { color: #888; margin-top: 5px; font-size: 0.88rem; font-weight: 400; letter-spacing: 0.5px; }
+
+    /* HAMBURGER */
+    .hamburger { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 8px; display: flex; flex-direction: column; gap: 5px; z-index: 1001; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: #9b59ff; border-radius: 2px; transition: 0.3s; }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* SIDEBAR */
+    .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; background: linear-gradient(180deg, #0d0d1a, #12122a); border-right: 1px solid rgba(155,89,255,0.3); z-index: 1000; transition: left 0.3s ease; padding: 80px 0 30px; }
+    .sidebar.open { left: 0; }
+    .sidebar-title { color: #555; font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 0 24px 12px; }
+    .sidebar a { display: flex; align-items: center; gap: 12px; padding: 14px 24px; color: #aaa; text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: 0.2s; border-left: 3px solid transparent; }
+    .sidebar a:hover { color: white; background: rgba(155,89,255,0.08); border-left-color: #9b59ff; }
+    .sidebar a .icon { font-size: 1.1rem; width: 24px; text-align: center; }
+    .sidebar-divider { border: none; border-top: 1px solid rgba(155,89,255,0.1); margin: 12px 24px; }
+
+    /* OVERLAY */
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .overlay.show { opacity: 1; pointer-events: all; }
 
     /* HERO */
     .hero { text-align: center; padding: 50px 16px 35px; background: radial-gradient(ellipse at top, rgba(155,89,255,0.08) 0%, transparent 70%); }
@@ -55,8 +75,6 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-text { font-size: 1rem; color: white; margin-bottom: 6px; font-weight: 600; }
     .loading-sub { font-size: 0.82rem; color: #555; }
-
-    /* DL STATUS */
     .dl-loading { background: rgba(155,89,255,0.06); border-radius: 12px; padding: 24px 20px; text-align: center; margin-top: 16px; border: 1px solid rgba(155,89,255,0.3); }
     .dl-loading p { color: white; font-size: 0.95rem; margin-bottom: 6px; font-weight: 600; }
     .dl-loading small { color: #555; font-size: 0.82rem; }
@@ -70,7 +88,6 @@
     .info-section h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(90deg, #9b59ff, #e94560); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .info-section h3 { font-size: 1.05rem; font-weight: 700; margin: 24px 0 10px; color: #ccc; }
     .info-section p { color: #777; font-size: 0.88rem; line-height: 1.8; margin-bottom: 12px; }
-    .info-section ul { color: #777; font-size: 0.88rem; line-height: 1.9; padding-left: 20px; margin-bottom: 12px; }
     .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 20px 0; }
     .step { background: linear-gradient(135deg, #0f0f20, #12122a); border-radius: 14px; padding: 20px; border: 1px solid rgba(155,89,255,0.15); text-align: center; }
     .step .step-num { background: linear-gradient(135deg, #9b59ff, #e94560); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; margin: 0 auto 12px; font-size: 1rem; }
@@ -82,7 +99,7 @@
     .feature h4 { color: white; font-size: 0.9rem; margin-bottom: 6px; font-weight: 700; }
     .feature p { color: #666; font-size: 0.8rem; margin: 0; line-height: 1.5; }
     .divider { border: none; border-top: 1px solid rgba(155,89,255,0.1); margin: 30px 0; }
-    .faq-item { margin-bottom: 18px; padding: 16px; background: linear-gradient(135deg, #0f0f20, #12122a); border-radius: 12px; border: 1px solid rgba(155,89,255,0.1); }
+    .faq-item { margin-bottom: 14px; padding: 16px; background: linear-gradient(135deg, #0f0f20, #12122a); border-radius: 12px; border: 1px solid rgba(155,89,255,0.1); }
     .faq-item h4 { color: white; font-size: 0.9rem; margin-bottom: 6px; font-weight: 700; }
     .faq-item p { color: #666; font-size: 0.84rem; margin: 0; line-height: 1.6; }
 
@@ -94,7 +111,24 @@
 </head>
 <body>
 
+<!-- SIDEBAR -->
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-title">Menú</div>
+  <a href="/"><span class="icon">🏠</span> Inicio</a>
+  <a href="/about.html"><span class="icon">ℹ️</span> Sobre nosotros</a>
+  <hr class="sidebar-divider">
+  <a href="/privacy.html"><span class="icon">🔒</span> Política de privacidad</a>
+  <a href="/terms.html"><span class="icon">📄</span> Términos de uso</a>
+  <a href="/contact.html"><span class="icon">✉️</span> Contacto</a>
+</div>
+
 <header>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
   <h1>GetYourVideo</h1>
   <p>Descarga vídeos de TikTok gratis · Sin marca de agua · Alta calidad</p>
 </header>
@@ -180,7 +214,6 @@
   <hr class="divider">
 
   <h2>Preguntas frecuentes</h2>
-
   <div class="faq-item">
     <h4>¿Qué es GetYourVideo?</h4>
     <p>GetYourVideo es una herramienta online gratuita para descargar vídeos de TikTok sin marca de agua y en alta calidad, directamente desde tu navegador.</p>
@@ -214,24 +247,32 @@
 
   <h2>Privacidad</h2>
   <p>GetYourVideo respeta tu privacidad. No recopilamos datos personales, no almacenamos vídeos descargados ni rastreamos el historial de descargas. El uso de GetYourVideo es completamente anónimo.</p>
-  <p>Los vídeos que descargas están alojados en los servidores de TikTok. Todos los derechos pertenecen a sus respectivos propietarios.</p>
 
   <hr class="divider">
-
-  <p style="color:#333; font-size:0.78rem;">⚠️ GetYourVideo no tiene ninguna relación con TikTok o ByteDance Ltd. Esta herramienta está diseñada para ayudar a los usuarios a guardar sus propios vídeos de TikTok. No alojamos ningún contenido de TikTok. Todos los derechos pertenecen a sus respectivos propietarios.</p>
+  <p style="color:#333; font-size:0.78rem;">⚠️ GetYourVideo no tiene ninguna relación con TikTok o ByteDance Ltd. No alojamos ningún contenido de TikTok. Todos los derechos pertenecen a sus respectivos propietarios.</p>
 </div>
 
 <footer>
   <p>GetYourVideo © 2025 — Descarga vídeos de TikTok gratis y sin marca de agua</p>
   <p style="margin-top:8px;">
-    <a href="#">Privacidad</a>
-    <a href="#">Términos de uso</a>
-    <a href="#">Contacto</a>
+    <a href="/privacy.html">Privacidad</a>
+    <a href="/terms.html">Términos de uso</a>
+    <a href="/about.html">Sobre nosotros</a>
+    <a href="/contact.html">Contacto</a>
   </p>
 </footer>
 
 <script>
   let currentUrl = '';
+
+  function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('active');
+    overlay.classList.toggle('show');
+  }
 
   async function getVideo() {
     const url = document.getElementById('urlInput').value.trim();
@@ -289,9 +330,7 @@
           <small>En unos segundos aparecerá en tu carpeta de descargas.</small>
         </div>`;
     }
-
     window.location.href = `/api/download?url=${encodeURIComponent(currentUrl)}&quality=${quality}`;
-
     setTimeout(() => {
       const status = document.getElementById('dl-status');
       if (status) {
