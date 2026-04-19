@@ -2,16 +2,18 @@ const express = require('express');
 const cors = require('cors');
 const { exec } = require('child_process');
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// 🔥 CACHE
-const cache = new Map();
 
-const YTDLP_OPTS = `--user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" --no-check-certificates`;
+const YTDLP_OPTS = `--user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" --add-header "Accept-Language:en-US,en;q=0.9" --extractor-args "youtube:player_client=android" --no-check-certificates`;
+
 
 app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'privacy.html')));
 app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'terms.html')));
@@ -19,28 +21,23 @@ app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'about.html'))
 app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'contact.html')));
 
 
-
-// =========================
-// ⚡ API INFO (con cache)
-// =========================
 app.post('/api/info', (req, res) => {
   const { url } = req.body;
   if (!url) return res.status(400).json({ error: 'URL requerida' });
 
-  if (cache.has(url)) {
-    console.log('CACHE HIT');
-    return res.json(cache.get(url));
-  }
 
-  exec(`yt-dlp --dump-json --no-playlist ${YTDLP_OPTS} "${url}"`, { timeout: 15000 }, (error, stdout) => {
+  console.log('Intentando obtener:', url);
+
+
+  exec(`yt-dlp --dump-json --no-playlist ${YTDLP_OPTS} "${url}"`, { timeout: 30000 }, (error, stdout, stderr) => {
     if (error) {
+      console.error('ERROR yt-dlp:', stderr);
       return res.status(500).json({ error: 'No se pudo obtener el vídeo.' });
     }
-
     try {
       const info = JSON.parse(stdout);
-
-      const response = {
+      console.log('OK:', info.title);
+      res.json({
         title: info.title,
         thumbnail: info.thumbnail,
         duration: info.duration_string,
@@ -49,46 +46,41 @@ app.post('/api/info', (req, res) => {
           { quality: '720p', label: '720p · HD' },
           { quality: '1080p', label: '1080p · Full HD' }
         ]
-      };
-
-      cache.set(url, response);
-      setTimeout(() => cache.delete(url), 600000);
-
-      res.json(response);
-    } catch {
+      });
+    } catch (e) {
+      console.error('ERROR parse:', e.message);
       res.status(500).json({ error: 'Error procesando la respuesta' });
     }
   });
 });
 
 
-
-// =========================
-// 🚀 DESCARGA ULTRA RÁPIDA
-// =========================
 app.get('/api/download', (req, res) => {
   const { url, quality } = req.query;
-  if (!url) return res.status(400).send('URL requerida');
+  if (!url) return res.status(400).json({ error: 'URL requerida' });
+
 
   const height = (quality || '720p').replace('p', '');
+  const tmpFile = path.join(os.tmpdir(), `video_${Date.now()}.mp4`);
+  const cmd = `yt-dlp -f "bestvideo[height<=${height}][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=${height}]+bestaudio/best[height<=${height}]/best" --merge-output-format mp4 ${YTDLP_OPTS} -o "${tmpFile}" "${url}"`;
 
-  console.log('Redirigiendo descarga:', url);
 
-  // 🔥 SOLO OBTENER URL REAL (NO DESCARGAR)
-  const cmd = `yt-dlp -f "best[height<=${height}]" --get-url ${YTDLP_OPTS} "${url}"`;
+  console.log('Descargando:', url, 'calidad:', quality);
 
-  exec(cmd, { timeout: 15000 }, (error, stdout) => {
-    if (error || !stdout) {
-      return res.status(500).send('Error obteniendo el vídeo');
+
+  exec(cmd, { timeout: 300000 }, (error, stdout, stderr) => {
+    if (error || !fs.existsSync(tmpFile)) {
+      console.error('ERROR descarga:', stderr);
+      if (!res.headersSent) res.status(500).send('Error descargando el vídeo');
+      return;
     }
-
-    const videoUrl = stdout.trim().split('\n')[0];
-
-    // ⚡ REDIRECCIÓN DIRECTA
-    res.redirect(videoUrl);
+    res.setHeader('Content-Disposition', `attachment; filename="video_${height}p.mp4"`);
+    res.setHeader('Content-Type', 'video/mp4');
+    const stream = fs.createReadStream(tmpFile);
+    stream.pipe(res);
+    stream.on('close', () => fs.unlink(tmpFile, () => {}));
   });
 });
-
 
 
 const PORT = process.env.PORT || 3001;
